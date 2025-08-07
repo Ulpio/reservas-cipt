@@ -1,0 +1,41 @@
+# Binários
+/bin/
+/build/
+*.exe
+*.out
+
+# Config
+.env
+*.env
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Binários Go
+*.exe
+*.test
+*.out
+
+# Diretórios
+/bin/
+/build/
+
+# Configs locais
+.env
+*.env
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
