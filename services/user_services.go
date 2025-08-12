@@ -54,6 +54,23 @@ func CreateUser(name, cpf, role string) (dto.UserOutputDTO, error) {
 	return output, nil
 }
 
+func CreateAdmin(name, cpf string) (dto.UserOutputDTO, error) {
+	hashedPass, err := utils.HashPassword("ciptadmin")
+	if err != nil {
+		return dto.UserOutputDTO{}, err
+	}
+	user := models.User{
+		Name: name, CPF: cpf, Role: "admin", Password: hashedPass,
+	}
+	if err := database.DB.Create(&user).Error; err != nil {
+		return dto.UserOutputDTO{}, err
+	}
+	output := dto.UserOutputDTO{
+		ID: user.ID, CPF: user.CPF, Role: user.Role, Name: user.Name,
+	}
+	return output, nil
+}
+
 func DeleteUser(id uint) error {
 	if err := database.DB.Delete(&models.User{}, id).Error; err != nil {
 		return err
