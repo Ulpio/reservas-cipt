@@ -3,28 +3,13 @@ package services_test
 import (
 	"testing"
 
-	"github.com/Ulpio/reservas-cipt/database"
-	"github.com/Ulpio/reservas-cipt/models"
 	"github.com/Ulpio/reservas-cipt/services"
+	"github.com/Ulpio/reservas-cipt/tests"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
-func setupTestDB(t *testing.T) *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-	assert.NoError(t, err)
-
-	err = db.AutoMigrate(&models.User{})
-	assert.NoError(t, err)
-
-	database.DB = db
-
-	return db
-}
-
 func TestCreateAndGetUser(t *testing.T) {
-	setupTestDB(t)
+	tests.SetupTestDB(t)
 
 	// Cria o usuário
 	created, err := services.CreateUser("Alice", "12345678900", "admin")
@@ -39,7 +24,7 @@ func TestCreateAndGetUser(t *testing.T) {
 }
 
 func TestGetAllUsers(t *testing.T) {
-	setupTestDB(t)
+	tests.SetupTestDB(t)
 
 	// Cria múltiplos usuários
 	_, _ = services.CreateUser("User 1", "11111111111", "admin")
@@ -51,7 +36,7 @@ func TestGetAllUsers(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	setupTestDB(t)
+	tests.SetupTestDB(t)
 
 	u, _ := services.CreateUser("Temp", "99999999999", "admin")
 

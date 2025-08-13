@@ -7,10 +7,10 @@ import (
 )
 
 func SetupUserRoutes(r *gin.Engine) {
-	users := r.Group("/user")
+	users := r.Group("/users")
 	users.GET("/", middleware.JWTAuthMiddleware(), handlers.GetAllUsersHandler)
 	users.GET("/me", middleware.JWTAuthMiddleware(), handlers.MeHandler)
 	users.POST("/", middleware.JWTAuthMiddleware(), handlers.CreateUserHandler)
-	users.GET("/:id", handlers.GetUserByIDHandler)
+	users.GET("/:id", middleware.JWTAuthMiddleware(), handlers.GetUserByIDHandler)
 	users.DELETE("/:id", middleware.JWTAuthMiddleware(), handlers.DeleteUserHandler)
 }
