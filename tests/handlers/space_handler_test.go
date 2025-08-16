@@ -178,3 +178,107 @@ func TestUpdateSpaceNoticeHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.Code)
 	assert.Contains(t, resp.Body.String(), "Aviso atualizado com sucesso")
 }
+
+func TestCreateSpace_Unauthorized(t *testing.T) {
+	router := setupSpaceRouter()
+	body := dto.CreateSpaceDTO{Name: "Sala 8", Type: "sala", Status: "ativo", Capacity: 10}
+	jsonBody, _ := json.Marshal(body)
+
+	req, _ := http.NewRequest(http.MethodPost, "/espacos/", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Content-Type", "application/json") // sem Authorization
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusUnauthorized, resp.Code)
+}
+
+func TestCreateSpace_ForbiddenForRecepcionista(t *testing.T) {
+	tests.SetupTestDB(t)
+	recep, _ := services.CreateUser("Recep", "77777777777", "recepcionista")
+	token, _ := utils.GenerateJWT(recep.ID, recep.Role)
+
+	router := setupSpaceRouter()
+	body := dto.CreateSpaceDTO{Name: "Sala 9", Type: "sala", Status: "ativo", Capacity: 10}
+	jsonBody, _ := json.Marshal(body)
+
+	req, _ := http.NewRequest(http.MethodPost, "/espacos/", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusForbidden, resp.Code)
+}
+
+func TestCreateSpace_InvalidPayload(t *testing.T) {
+	tests.SetupTestDB(t)
+	admin, _ := services.CreateUser("Admin", "88888888888", "admin")
+	token, _ := utils.GenerateJWT(admin.ID, admin.Role)
+
+	router := setupSpaceRouter()
+	invalidJSON := []byte(`{"name": 123}`) // tipo errado
+
+	req, _ := http.NewRequest(http.MethodPost, "/espacos/", bytes.NewBuffer(invalidJSON))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusBadRequest, resp.Code)
+}
+
+func TestGetSpaceByID_NotFound(t *testing.T) {
+	tests.SetupTestDB(t)
+	admin, _ := services.CreateUser("Admin", "99999999999", "admin")
+	token, _ := utils.GenerateJWT(admin.ID, admin.Role)
+
+	router := setupSpaceRouter()
+
+	req, _ := http.NewRequest(http.MethodGet, "/espacos/99999", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusNotFound, resp.Code)
+}
+
+func TestUpdateStatus_RecepcionistaCanUpdate(t *testing.T) {
+	tests.SetupTestDB(t)
+	recep, _ := services.CreateUser("Recep", "12121212121", "recepcionista")
+	token, _ := utils.GenerateJWT(recep.ID, recep.Role)
+
+	space, _ := services.CreateSpace(dto.CreateSpaceDTO{Name: "Sala 10", Type: "sala", Status: "ativo", Capacity: 10})
+	body := dto.UpdateStatusDTO{Status: "manutencao"}
+	jsonBody, _ := json.Marshal(body)
+
+	router := setupSpaceRouter()
+	req, _ := http.NewRequest(http.MethodPatch, "/espacos/"+strconv.Itoa(int(space.ID))+"/status", bytes.NewBuffer(jsonBody))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Contains(t, resp.Body.String(), "Status atualizado com sucesso")
+}
+
+func TestDeleteSpace_RecepcionistaCannotDelete(t *testing.T) {
+	tests.SetupTestDB(t)
+	recep, _ := services.CreateUser("Recep", "13131313131", "recepcionista")
+	token, _ := utils.GenerateJWT(recep.ID, recep.Role)
+	space, _ := services.CreateSpace(dto.CreateSpaceDTO{Name: "Sala 11", Type: "sala", Status: "ativo", Capacity: 10})
+
+	router := setupSpaceRouter()
+	req, _ := http.NewRequest(http.MethodDelete, "/espacos/"+strconv.Itoa(int(space.ID)), nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+
+	assert.Equal(t, http.StatusForbidden, resp.Code)
+}
