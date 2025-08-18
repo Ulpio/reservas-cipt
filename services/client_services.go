@@ -39,3 +39,26 @@ func BuscarOuCriarCliente(input dto.ClienteInputDTO) (dto.ClienteOutputDTO, erro
 		Strikes: novo.Strikes,
 	}, nil
 }
+
+func GetAllClientes() ([]dto.ClienteOutputDTO, error) {
+	var clientes []models.Client
+	if err := database.DB.Find(&clientes); err != nil {
+		return nil, err.Error
+	}
+	var output []dto.ClienteOutputDTO
+	for _, s := range clientes {
+		output = append(output, toClientOutput(s))
+	}
+	return output, nil
+}
+
+func toClientOutput(client models.Client) dto.ClienteOutputDTO {
+	return dto.ClienteOutputDTO{
+		ID:      client.ID,
+		Name:    client.Name,
+		CPF:     client.CPF,
+		Email:   client.Email,
+		Phone:   client.Phone,
+		Strikes: client.Strikes,
+	}
+}
