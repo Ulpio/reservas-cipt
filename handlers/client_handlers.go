@@ -23,3 +23,12 @@ func BuscarOuCriarClienteHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, cliente)
 }
+
+func GetAllClientes(c *gin.Context) {
+	clientes, err := services.GetAllClientes()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar ou criar cliente"})
+		return
+	}
+	c.JSON(http.StatusOK, clientes)
+}
