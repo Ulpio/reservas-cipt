@@ -7,9 +7,10 @@ import (
 )
 
 func SetupClientRoutes(r *gin.Engine) {
-	grupo := r.Group("/client")
+	grupo := r.Group("/clientes")
 	grupo.Use(middleware.JWTAuthMiddleware())
 	{
 		grupo.POST("/buscar-criar", handlers.BuscarOuCriarClienteHandler)
+		grupo.GET("/", handlers.GetAllClientes)
 	}
 }
