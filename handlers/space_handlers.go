@@ -44,6 +44,10 @@ func GetSpacesByIDHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
+	if sala.ID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "sala não encontrada"})
+		return
+	}
 	c.JSON(http.StatusOK, sala)
 }
 
