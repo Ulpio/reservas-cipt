@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/Ulpio/reservas-cipt/database"
 	"github.com/Ulpio/reservas-cipt/dto"
 	"github.com/Ulpio/reservas-cipt/models"
@@ -50,6 +52,17 @@ func GetAllClientes() ([]dto.ClienteOutputDTO, error) {
 		output = append(output, toClientOutput(s))
 	}
 	return output, nil
+}
+
+func GetClientByCPF(cpf string) (dto.ClienteOutputDTO, error) {
+	var cliente models.Client
+	if err := database.DB.Where("cpf = ? ", cpf).Find(&cliente); err != nil {
+		return dto.ClienteOutputDTO{}, err.Error
+	}
+	if cliente.ID == 0 {
+		return dto.ClienteOutputDTO{}, errors.New("erro ao encontrar usuario")
+	}
+	return toClientOutput(cliente), nil
 }
 
 func toClientOutput(client models.Client) dto.ClienteOutputDTO {

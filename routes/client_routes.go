@@ -10,6 +10,7 @@ func SetupClientRoutes(r *gin.Engine) {
 	grupo := r.Group("/clientes")
 	grupo.Use(middleware.JWTAuthMiddleware())
 	{
+		grupo.GET("/:cpf", handlers.BuscarClientePorCPF)
 		grupo.POST("/buscar-criar", handlers.BuscarOuCriarClienteHandler)
 		grupo.GET("/", handlers.GetAllClientes)
 	}

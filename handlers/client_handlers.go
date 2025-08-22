@@ -24,6 +24,16 @@ func BuscarOuCriarClienteHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, cliente)
 }
 
+func BuscarClientePorCPF(c *gin.Context) {
+	cpf := c.Param("cpf")
+	cliente, err := services.GetClientByCPF(cpf)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "usuario nao encontrado", "details": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, cliente)
+}
+
 func GetAllClientes(c *gin.Context) {
 	clientes, err := services.GetAllClientes()
 	if err != nil {
