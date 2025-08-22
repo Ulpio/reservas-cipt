@@ -14,11 +14,12 @@ type CreateReservationDTO struct {
 
 // ReservationOutputDTO represents reservation data returned in responses.
 type ReservationOutputDTO struct {
-	ID             uint      `json:"id"`
-	ClientID       uint      `json:"client_id"`
-	ReceptionistID uint      `json:"receptionist_id"`
-	SpaceID        uint      `json:"space_id"`
-	Date           time.Time `json:"date"`
-	StartTime      time.Time `json:"start_time"`
-	DurationHours  int       `json:"duration_hours"`
+	ID               uint   `json:"id"`
+	ClientName       string `json:"client_name"`
+	ReceptionistName string `json:"receptionist_name"`
+	SpaceName        string `json:"space_name"`
+	Date             string `json:"date"`
+	StartTime        string `json:"start_time"`
+	DurationHours    int    `json:"duration_hours"`
+	EndTime          string `json:"end_time"`
 }

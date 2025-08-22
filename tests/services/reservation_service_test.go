@@ -35,14 +35,19 @@ func TestCreateAndRetrieveReservation(t *testing.T) {
 
 	created, err := services.CreateReservation(input)
 	assert.NoError(t, err)
-	assert.Equal(t, client.ID, created.ClientID)
+	assert.Equal(t, client.Name, created.ClientName)
+	assert.Equal(t, "02/01/2024", created.Date)
+	assert.Equal(t, "09:00", created.StartTime)
+	assert.Equal(t, "11:00", created.EndTime)
 
 	fetched, err := services.GetReservationByID(created.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, created.ID, fetched.ID)
+	assert.Equal(t, "11:00", fetched.EndTime)
 	assert.Equal(t, 2, fetched.DurationHours)
 
 	all, err := services.GetAllReservations()
 	assert.NoError(t, err)
 	assert.Len(t, all, 1)
+	assert.Equal(t, client.Name, all[0].ClientName)
 }
