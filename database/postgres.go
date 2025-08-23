@@ -34,5 +34,5 @@ func ConnectDB() {
 }
 
 func MigrateModels() {
-	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.User{}, &models.Client{}, &models.Space{}, &models.Reservation{})
 }
