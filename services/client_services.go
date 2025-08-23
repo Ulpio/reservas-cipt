@@ -53,6 +53,21 @@ func GetClientByCPF(cpf string) (dto.ClienteOutputDTO, error) {
 	return toClientOutput(cliente), nil
 }
 
+func UpdateClient(id uint, input dto.ClienteInputDTO) (dto.ClienteOutputDTO, error) {
+	var cliente models.Client
+	if err := database.DB.First(&cliente, id).Error; err != nil {
+		return dto.ClienteOutputDTO{}, err
+	}
+	cliente.Name = input.Name
+	cliente.Email = input.Email
+	cliente.Phone = input.Phone
+
+	if err := database.DB.Save(&cliente).Error; err != nil {
+		return dto.ClienteOutputDTO{}, nil
+	}
+	return toClientOutput(cliente), nil
+}
+
 func toClientOutput(client models.Client) dto.ClienteOutputDTO {
 	return dto.ClienteOutputDTO{
 		ID:      client.ID,

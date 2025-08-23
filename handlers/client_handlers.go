@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Ulpio/reservas-cipt/dto"
 	"github.com/Ulpio/reservas-cipt/services"
@@ -41,4 +42,26 @@ func GetAllClientes(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, clientes)
+}
+
+func UpdateClientHandler(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		return
+	}
+
+	var input dto.ClienteInputDTO
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updated, err := services.UpdateClient(uint(id), input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar cliente"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updated)
 }
