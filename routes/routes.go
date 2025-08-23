@@ -8,5 +8,6 @@ func SetupRoutes() {
 	SetupAuthRoutes(r)
 	SpaceRoutes(r)
 	SetupClientRoutes(r)
+	SetupReservationRoutes(r)
 	r.Run(":8080")
 }

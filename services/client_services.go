@@ -6,6 +6,7 @@ import (
 	"github.com/Ulpio/reservas-cipt/database"
 	"github.com/Ulpio/reservas-cipt/dto"
 	"github.com/Ulpio/reservas-cipt/models"
+	"gorm.io/gorm"
 )
 
 func BuscarOuCriarCliente(input dto.ClienteInputDTO) (dto.ClienteOutputDTO, error) {
@@ -13,14 +14,11 @@ func BuscarOuCriarCliente(input dto.ClienteInputDTO) (dto.ClienteOutputDTO, erro
 	result := database.DB.Where("cpf =?", input.CPF).First(&cliente)
 
 	if result.Error == nil {
-		return dto.ClienteOutputDTO{
-			ID:      cliente.ID,
-			Name:    cliente.Name,
-			CPF:     cliente.CPF,
-			Email:   cliente.Email,
-			Phone:   cliente.Phone,
-			Strikes: cliente.Strikes,
-		}, nil
+		return toClientOutput(cliente), nil
+	}
+
+	if !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return dto.ClienteOutputDTO{}, result.Error
 	}
 
 	novo := models.Client{
@@ -32,20 +30,13 @@ func BuscarOuCriarCliente(input dto.ClienteInputDTO) (dto.ClienteOutputDTO, erro
 	if err := database.DB.Create(&novo).Error; err != nil {
 		return dto.ClienteOutputDTO{}, err
 	}
-	return dto.ClienteOutputDTO{
-		ID:      novo.ID,
-		Name:    novo.Name,
-		CPF:     novo.CPF,
-		Email:   novo.Email,
-		Phone:   novo.Phone,
-		Strikes: novo.Strikes,
-	}, nil
+	return toClientOutput(novo), nil
 }
 
 func GetAllClientes() ([]dto.ClienteOutputDTO, error) {
 	var clientes []models.Client
-	if err := database.DB.Find(&clientes); err != nil {
-		return nil, err.Error
+	if err := database.DB.Find(&clientes).Error; err != nil {
+		return nil, err
 	}
 	var output []dto.ClienteOutputDTO
 	for _, s := range clientes {
@@ -56,11 +47,23 @@ func GetAllClientes() ([]dto.ClienteOutputDTO, error) {
 
 func GetClientByCPF(cpf string) (dto.ClienteOutputDTO, error) {
 	var cliente models.Client
-	if err := database.DB.Where("cpf = ? ", cpf).Find(&cliente); err != nil {
-		return dto.ClienteOutputDTO{}, err.Error
+	if err := database.DB.Where("cpf = ?", cpf).First(&cliente).Error; err != nil {
+		return dto.ClienteOutputDTO{}, err
 	}
-	if cliente.ID == 0 {
-		return dto.ClienteOutputDTO{}, errors.New("erro ao encontrar usuario")
+	return toClientOutput(cliente), nil
+}
+
+func UpdateClient(id uint, input dto.ClienteInputDTO) (dto.ClienteOutputDTO, error) {
+	var cliente models.Client
+	if err := database.DB.First(&cliente, id).Error; err != nil {
+		return dto.ClienteOutputDTO{}, err
+	}
+	cliente.Name = input.Name
+	cliente.Email = input.Email
+	cliente.Phone = input.Phone
+
+	if err := database.DB.Save(&cliente).Error; err != nil {
+		return dto.ClienteOutputDTO{}, nil
 	}
 	return toClientOutput(cliente), nil
 }
