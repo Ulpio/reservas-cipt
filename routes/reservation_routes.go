@@ -7,12 +7,12 @@ import (
 )
 
 // SetupReservationRoutes configures routes for reservation operations.
-func SetupReservationRoutes(r *gin.Engine) {
+func SetupReservationRoutes(r *gin.RouterGroup) {
 	group := r.Group("/reservas")
 	group.Use(middleware.JWTAuthMiddleware(), middleware.OnlyReceptionist())
 	{
-		group.POST("/", handlers.CreateReservationHandler)
-		group.GET("/", handlers.GetAllReservationsHandler)
+		group.POST("", handlers.CreateReservationHandler)
+		group.GET("", handlers.GetAllReservationsHandler)
 		group.GET("/:id", handlers.GetReservationByIDHandler)
 	}
 }

@@ -6,19 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SpaceRoutes(r *gin.Engine) {
+func SpaceRoutes(r *gin.RouterGroup) {
 	spaceGroup := r.Group("/espacos")
 	spaceGroup.Use(middleware.JWTAuthMiddleware())
 
-	spaceGroup.GET("/", handlers.GetAllSpacesHandler)
+	spaceGroup.GET("", handlers.GetAllSpacesHandler)
 	spaceGroup.GET("/:id", handlers.GetSpacesByIDHandler)
 
 	spaceGroup.PATCH("/:id/status", handlers.UpdateSpaceStatusHandler)
 	spaceGroup.PATCH("/:id/aviso", handlers.UpdateSpaceNoticeHandler)
 
-	admin := spaceGroup.Group("/")
+	admin := spaceGroup.Group("")
 	admin.Use(middleware.OnlyAdmin())
-	admin.POST("/", handlers.CreateSpaceHandler)
+	admin.POST("", handlers.CreateSpaceHandler)
 	admin.PUT("/:id", handlers.UpdateSpaceHandler)
 	admin.DELETE("/:id", handlers.DeleteSpaceHandler)
 }

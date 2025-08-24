@@ -8,6 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// LoginHandler autentica um usuário e retorna um token JWT.
+// @Summary Autentica um usuário
+// @Description Endpoint público utilizado para autenticar usuários do sistema.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param input body dto.LoginInputDTO true "Credenciais de acesso"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} gin.H
+// @Failure 401 {object} gin.H
+// @Router /auth/login [post]
 func LoginHandler(c *gin.Context) {
 	var input dto.LoginInputDTO
 	if err := c.ShouldBindJSON(&input); err != nil {

@@ -1,3 +1,12 @@
+// @title Reserva de Espaços - CIPT Jaraguá
+// @version 1.0
+// @description API interna para gestão de reservas e controle de espaços físicos no Centro de Inovação do Polo Tecnológico - Jaraguá, Maceió.
+// @contact.name Ulpio Netto
+// @contact.email oxetech.mcz@gmail.com
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+// @host localhost:8080
+// @BasePath /api/v1
 package main
 
 import (
