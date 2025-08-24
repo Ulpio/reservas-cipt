@@ -1,0 +1,852 @@
+basePath: /api/v1
+definitions:
+  dto.ClienteInputDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    required:
+    - cpf
+    type: object
+  dto.ClienteOutputDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      strikes:
+        type: integer
+    type: object
+  dto.CreateReservationDTO:
+    properties:
+      client_id:
+        type: integer
+      date:
+        type: string
+      duration_hours:
+        type: integer
+      receptionist_id:
+        type: integer
+      space_id:
+        type: integer
+      start_time:
+        type: string
+    required:
+    - client_id
+    - date
+    - duration_hours
+    - receptionist_id
+    - space_id
+    - start_time
+    type: object
+  dto.CreateSpaceDTO:
+    properties:
+      capacity:
+        type: integer
+      name:
+        type: string
+      notice:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    required:
+    - capacity
+    - name
+    - status
+    - type
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  dto.LoginInputDTO:
+    properties:
+      cpf:
+        type: string
+      password:
+        type: string
+    required:
+    - cpf
+    - password
+    type: object
+  dto.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.ReservationOutputDTO:
+    properties:
+      client_name:
+        type: string
+      date:
+        type: string
+      duration_hours:
+        type: integer
+      end_time:
+        type: string
+      id:
+        type: integer
+      receptionist_name:
+        type: string
+      space_name:
+        type: string
+      start_time:
+        type: string
+    type: object
+  dto.SpaceOutputDTO:
+    properties:
+      capacity:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      notice:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.StrikeInputDTO:
+    properties:
+      client_id:
+        type: integer
+      photo:
+        type: string
+      reason:
+        type: string
+    required:
+    - client_id
+    - reason
+    type: object
+  dto.StrikeOutputDTO:
+    properties:
+      client_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      photo:
+        type: string
+      reason:
+        type: string
+      revoked:
+        type: boolean
+      revoked_at:
+        type: string
+    type: object
+  dto.UpdateNoticeDTO:
+    properties:
+      notice:
+        type: string
+    required:
+    - notice
+    type: object
+  dto.UpdateSpaceDTO:
+    properties:
+      capacity:
+        type: integer
+      name:
+        type: string
+      notice:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.UpdateStatusDTO:
+    properties:
+      status:
+        type: string
+    required:
+    - status
+    type: object
+  dto.UserInputDTO:
+    properties:
+      cpf:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  dto.UserOutputDTO:
+    properties:
+      cpf:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: oxetech.mcz@gmail.com
+    name: Ulpio Netto
+  description: API interna para gestão de reservas e controle de espaços físicos no
+    Centro de Inovação do Polo Tecnológico - Jaraguá, Maceió.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Reserva de Espaços - CIPT Jaraguá
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint público utilizado para autenticar usuários do sistema.
+      parameters:
+      - description: Credenciais de acesso
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Autentica um usuário
+      tags:
+      - auth
+  /clientes:
+    get:
+      description: Retorna todos os clientes registrados.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ClienteOutputDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Lista clientes
+      tags:
+      - clientes
+  /clientes/{cpf}:
+    get:
+      description: Retorna os dados de um cliente existente identificado pelo CPF.
+      parameters:
+      - description: CPF do cliente
+        in: path
+        name: cpf
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ClienteOutputDTO'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Busca cliente por CPF
+      tags:
+      - clientes
+  /clientes/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Atualiza informações de um cliente existente.
+      parameters:
+      - description: ID do cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Novos dados do cliente
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClienteInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ClienteOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Atualiza cliente
+      tags:
+      - clientes
+  /clientes/buscar-criar:
+    post:
+      consumes:
+      - application/json
+      description: Procura um cliente pelo CPF e cria caso não exista.
+      parameters:
+      - description: Dados do cliente
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClienteInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ClienteOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Busca ou cria cliente
+      tags:
+      - clientes
+  /espacos:
+    get:
+      description: Retorna todos os espaços registrados.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SpaceOutputDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Lista espaços
+      tags:
+      - espacos
+    post:
+      consumes:
+      - application/json
+      description: Endpoint utilizado por administradores para cadastrar um novo espaço
+        disponível para reserva.
+      parameters:
+      - description: Dados do espaço a ser criado
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSpaceDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SpaceOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Cria um novo espaço físico
+      tags:
+      - espacos
+  /espacos/{id}:
+    delete:
+      description: Remove um espaço previamente cadastrado.
+      parameters:
+      - description: ID do espaço
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Exclui espaço
+      tags:
+      - espacos
+    get:
+      description: Obtém os dados de um espaço a partir do seu identificador.
+      parameters:
+      - description: ID do espaço
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SpaceOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Busca espaço por ID
+      tags:
+      - espacos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza as informações completas de um espaço existente.
+      parameters:
+      - description: ID do espaço
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Novos dados do espaço
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateSpaceDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SpaceOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Atualiza espaço
+      tags:
+      - espacos
+  /espacos/{id}/aviso:
+    patch:
+      consumes:
+      - application/json
+      description: Modifica o aviso exibido para um espaço.
+      parameters:
+      - description: ID do espaço
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Novo aviso
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateNoticeDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Atualiza aviso do espaço
+      tags:
+      - espacos
+  /espacos/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Altera o status operacional de um espaço.
+      parameters:
+      - description: ID do espaço
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Novo status
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateStatusDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Atualiza status do espaço
+      tags:
+      - espacos
+  /reservas:
+    get:
+      description: Lista todas as reservas cadastradas.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ReservationOutputDTO'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Lista reservas
+      tags:
+      - reservas
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova reserva para um espaço.
+      parameters:
+      - description: Dados da reserva
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateReservationDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ReservationOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Cria reserva
+      tags:
+      - reservas
+  /reservas/{id}:
+    get:
+      description: Retorna os dados de uma reserva específica.
+      parameters:
+      - description: ID da reserva
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ReservationOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Busca reserva por ID
+      tags:
+      - reservas
+  /strikes:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma advertência para um cliente.
+      parameters:
+      - description: Dados do strike
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.StrikeInputDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.StrikeOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Registra strike
+      tags:
+      - strikes
+  /strikes/{id}:
+    delete:
+      description: Revoga uma advertência de um cliente.
+      parameters:
+      - description: ID do strike
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StrikeOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Revoga strike
+      tags:
+      - strikes
+  /strikes/client/{id}:
+    get:
+      description: Retorna as advertências associadas a um cliente específico.
+      parameters:
+      - description: ID do cliente
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.StrikeOutputDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Lista strikes por cliente
+      tags:
+      - strikes
+  /users:
+    get:
+      description: Endpoint restrito a administradores para listagem de usuários.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.UserOutputDTO'
+            type: array
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Lista usuários
+      tags:
+      - usuarios
+    post:
+      consumes:
+      - application/json
+      description: Endpoint restrito a administradores para cadastro de novos usuários.
+      parameters:
+      - description: Dados do usuário
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserInputDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Cria usuário
+      tags:
+      - usuarios
+  /users/{id}:
+    delete:
+      description: Exclui um usuário existente.
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Remove usuário
+      tags:
+      - usuarios
+    get:
+      description: Recupera os dados de um usuário específico.
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserOutputDTO'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Busca usuário por ID
+      tags:
+      - usuarios
+  /users/me:
+    get:
+      description: Recupera informações do usuário baseado no token de autenticação.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserOutputDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Retorna usuário autenticado
+      tags:
+      - usuarios
+swagger: "2.0"

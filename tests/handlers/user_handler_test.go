@@ -20,8 +20,9 @@ import (
 func setupTestRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	routes.SetupAuthRoutes(r)
-	routes.SetupUserRoutes(r)
+	api := r.Group("")
+	routes.SetupAuthRoutes(api)
+	routes.SetupUserRoutes(api)
 	return r
 }
 

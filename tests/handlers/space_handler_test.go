@@ -20,7 +20,8 @@ import (
 func setupSpaceRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
-	routes.SpaceRoutes(r)
+	api := r.Group("")
+	routes.SpaceRoutes(api)
 	return r
 }
 
