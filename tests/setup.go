@@ -20,7 +20,7 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	assert.NoError(t, err)
 
-	err = db.AutoMigrate(&models.User{}, &models.Space{}, &models.Client{}, &models.Reservation{})
+	err = db.AutoMigrate(&models.User{}, &models.Space{}, &models.Client{}, &models.Reservation{}, &models.Strike{})
 	assert.NoError(t, err)
 
 	database.DB = db
