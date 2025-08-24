@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/Ulpio/reservas-cipt/dto"
-	"github.com/Ulpio/reservas-cipt/routes"
+	"github.com/Ulpio/reservas-cipt/handlers"
+	"github.com/Ulpio/reservas-cipt/middleware"
 	"github.com/Ulpio/reservas-cipt/services"
 	"github.com/Ulpio/reservas-cipt/tests"
 	"github.com/Ulpio/reservas-cipt/utils"
@@ -21,8 +22,16 @@ func setupTestRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	api := r.Group("")
-	routes.SetupAuthRoutes(api)
-	routes.SetupUserRoutes(api)
+	auth := api.Group("/auth")
+	auth.POST("/login", handlers.LoginHandler)
+
+	users := api.Group("/users")
+	users.Use(middleware.JWTAuthMiddleware())
+	users.GET("", middleware.OnlyAdmin(), handlers.GetAllUsersHandler)
+	users.GET("/me", handlers.MeHandler)
+	users.POST("", middleware.OnlyAdmin(), handlers.CreateUserHandler)
+	users.GET("/:id", handlers.GetUserByIDHandler)
+	users.DELETE("/:id", middleware.OnlyAdmin(), handlers.DeleteUserHandler)
 	return r
 }
 
@@ -39,7 +48,7 @@ func TestCreateUserHandler(t *testing.T) {
 	}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest(http.MethodPost, "/users/", bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest(http.MethodPost, "/users", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 

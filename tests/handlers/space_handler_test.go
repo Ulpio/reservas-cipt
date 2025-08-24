@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/Ulpio/reservas-cipt/dto"
-	"github.com/Ulpio/reservas-cipt/routes"
+	"github.com/Ulpio/reservas-cipt/handlers"
+	"github.com/Ulpio/reservas-cipt/middleware"
 	"github.com/Ulpio/reservas-cipt/services"
 	"github.com/Ulpio/reservas-cipt/tests"
 	"github.com/Ulpio/reservas-cipt/utils"
@@ -21,7 +22,18 @@ func setupSpaceRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	api := r.Group("")
-	routes.SpaceRoutes(api)
+	espacos := api.Group("/espacos")
+	espacos.Use(middleware.JWTAuthMiddleware())
+	espacos.GET("", handlers.GetAllSpacesHandler)
+	espacos.GET("/:id", handlers.GetSpacesByIDHandler)
+	espacos.PATCH("/:id/status", handlers.UpdateSpaceStatusHandler)
+	espacos.PATCH("/:id/aviso", handlers.UpdateSpaceNoticeHandler)
+
+	admin := espacos.Group("")
+	admin.Use(middleware.OnlyAdmin())
+	admin.POST("", handlers.CreateSpaceHandler)
+	admin.PUT("/:id", handlers.UpdateSpaceHandler)
+	admin.DELETE("/:id", handlers.DeleteSpaceHandler)
 	return r
 }
 
@@ -36,7 +48,7 @@ func TestCreateSpaceHandler(t *testing.T) {
 	body := dto.CreateSpaceDTO{Name: "Sala 1", Type: "sala", Status: "ativo", Capacity: 10}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest(http.MethodPost, "/espacos/", bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest(http.MethodPost, "/espacos", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 
@@ -58,7 +70,7 @@ func TestGetAllSpacesHandler(t *testing.T) {
 
 	router := setupSpaceRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/espacos/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/espacos", nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	resp := httptest.NewRecorder()
@@ -185,7 +197,7 @@ func TestCreateSpace_Unauthorized(t *testing.T) {
 	body := dto.CreateSpaceDTO{Name: "Sala 8", Type: "sala", Status: "ativo", Capacity: 10}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest(http.MethodPost, "/espacos/", bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest(http.MethodPost, "/espacos", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Content-Type", "application/json") // sem Authorization
 
 	resp := httptest.NewRecorder()
@@ -203,7 +215,7 @@ func TestCreateSpace_ForbiddenForRecepcionista(t *testing.T) {
 	body := dto.CreateSpaceDTO{Name: "Sala 9", Type: "sala", Status: "ativo", Capacity: 10}
 	jsonBody, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest(http.MethodPost, "/espacos/", bytes.NewBuffer(jsonBody))
+	req, _ := http.NewRequest(http.MethodPost, "/espacos", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -221,7 +233,7 @@ func TestCreateSpace_InvalidPayload(t *testing.T) {
 	router := setupSpaceRouter()
 	invalidJSON := []byte(`{"name": 123}`) // tipo errado
 
-	req, _ := http.NewRequest(http.MethodPost, "/espacos/", bytes.NewBuffer(invalidJSON))
+	req, _ := http.NewRequest(http.MethodPost, "/espacos", bytes.NewBuffer(invalidJSON))
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
