@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupClientRoutes(r *gin.Engine) {
+func SetupClientRoutes(r *gin.RouterGroup) {
 	grupo := r.Group("/clientes")
 	grupo.Use(middleware.JWTAuthMiddleware())
 	{
 		grupo.PATCH("/:id", handlers.UpdateClientHandler)
 		grupo.GET("/:cpf", handlers.BuscarClientePorCPF)
 		grupo.POST("/buscar-criar", handlers.BuscarOuCriarClienteHandler)
-		grupo.GET("/", handlers.GetAllClientes)
+		grupo.GET("", handlers.GetAllClientes)
 	}
 }
