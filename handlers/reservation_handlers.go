@@ -17,8 +17,8 @@ import (
 // @Produce json
 // @Param input body dto.CreateReservationDTO true "Dados da reserva"
 // @Success 201 {object} dto.ReservationOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /reservas [post]
 func CreateReservationHandler(c *gin.Context) {
 	var input dto.CreateReservationDTO
@@ -43,8 +43,8 @@ func CreateReservationHandler(c *gin.Context) {
 // @Produce json
 // @Param id path int true "ID da reserva"
 // @Success 200 {object} dto.ReservationOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 404 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
 // @Router /reservas/{id} [get]
 func GetReservationByIDHandler(c *gin.Context) {
 	idParam := c.Param("id")
@@ -69,7 +69,7 @@ func GetReservationByIDHandler(c *gin.Context) {
 // @Tags reservas
 // @Produce json
 // @Success 200 {array} dto.ReservationOutputDTO
-// @Failure 500 {object} gin.H
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /reservas [get]
 func GetAllReservationsHandler(c *gin.Context) {
 	reservations, err := services.GetAllReservations()

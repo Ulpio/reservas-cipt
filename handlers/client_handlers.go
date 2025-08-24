@@ -17,8 +17,8 @@ import (
 // @Produce json
 // @Param input body dto.ClienteInputDTO true "Dados do cliente"
 // @Success 200 {object} dto.ClienteOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /clientes/buscar-criar [post]
 func BuscarOuCriarClienteHandler(c *gin.Context) {
 	var input dto.ClienteInputDTO
@@ -43,7 +43,7 @@ func BuscarOuCriarClienteHandler(c *gin.Context) {
 // @Produce json
 // @Param cpf path string true "CPF do cliente"
 // @Success 200 {object} dto.ClienteOutputDTO
-// @Failure 404 {object} gin.H
+// @Failure 404 {object} dto.ErrorResponse
 // @Router /clientes/{cpf} [get]
 func BuscarClientePorCPF(c *gin.Context) {
 	cpf := c.Param("cpf")
@@ -61,7 +61,7 @@ func BuscarClientePorCPF(c *gin.Context) {
 // @Tags clientes
 // @Produce json
 // @Success 200 {array} dto.ClienteOutputDTO
-// @Failure 500 {object} gin.H
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /clientes [get]
 func GetAllClientes(c *gin.Context) {
 	clientes, err := services.GetAllClientes()
@@ -81,8 +81,8 @@ func GetAllClientes(c *gin.Context) {
 // @Param id path int true "ID do cliente"
 // @Param input body dto.ClienteInputDTO true "Novos dados do cliente"
 // @Success 200 {object} dto.ClienteOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /clientes/{id} [patch]
 func UpdateClientHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
