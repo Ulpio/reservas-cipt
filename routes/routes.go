@@ -9,5 +9,6 @@ func SetupRoutes() {
 	SpaceRoutes(r)
 	SetupClientRoutes(r)
 	SetupReservationRoutes(r)
+	SetupStrikeRoutes(r)
 	r.Run(":8080")
 }
