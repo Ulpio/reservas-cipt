@@ -15,8 +15,8 @@ import (
 // @Tags usuarios
 // @Produce json
 // @Success 200 {array} dto.UserOutputDTO
-// @Failure 403 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /users [get]
 func GetAllUsersHandler(c *gin.Context) {
 	role := c.GetString("role")
@@ -39,8 +39,8 @@ func GetAllUsersHandler(c *gin.Context) {
 // @Produce json
 // @Param id path int true "ID do usuário"
 // @Success 200 {object} dto.UserOutputDTO
-// @Failure 403 {object} gin.H
-// @Failure 404 {object} gin.H
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
 // @Router /users/{id} [get]
 func GetUserByIDHandler(c *gin.Context) {
 	role := c.GetString("role")
@@ -70,9 +70,9 @@ func GetUserByIDHandler(c *gin.Context) {
 // @Produce json
 // @Param input body dto.UserInputDTO true "Dados do usuário"
 // @Success 201 {object} dto.UserOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 403 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /users [post]
 func CreateUserHandler(c *gin.Context) {
 	role := c.GetString("role")
@@ -99,8 +99,8 @@ func CreateUserHandler(c *gin.Context) {
 // @Tags usuarios
 // @Param id path int true "ID do usuário"
 // @Success 204 {object} nil
-// @Failure 403 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /users/{id} [delete]
 func DeleteUserHandler(c *gin.Context) {
 	role := c.GetString("role")
@@ -128,7 +128,7 @@ func DeleteUserHandler(c *gin.Context) {
 // @Tags usuarios
 // @Produce json
 // @Success 200 {object} dto.UserOutputDTO
-// @Failure 401 {object} gin.H
+// @Failure 401 {object} dto.ErrorResponse
 // @Router /users/me [get]
 func MeHandler(c *gin.Context) {
 	userIDInterface, exists := c.Get("userID")

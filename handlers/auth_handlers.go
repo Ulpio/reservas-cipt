@@ -16,8 +16,8 @@ import (
 // @Produce json
 // @Param input body dto.LoginInputDTO true "Credenciais de acesso"
 // @Success 200 {object} map[string]string
-// @Failure 400 {object} gin.H
-// @Failure 401 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
 // @Router /auth/login [post]
 func LoginHandler(c *gin.Context) {
 	var input dto.LoginInputDTO

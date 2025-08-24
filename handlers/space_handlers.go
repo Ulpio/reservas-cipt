@@ -17,8 +17,8 @@ import (
 // @Produce json
 // @Param input body dto.CreateSpaceDTO true "Dados do espaço a ser criado"
 // @Success 201 {object} dto.SpaceOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 401 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
 // @Router /espacos [post]
 func CreateSpaceHandler(c *gin.Context) {
 	var input dto.CreateSpaceDTO
@@ -41,7 +41,7 @@ func CreateSpaceHandler(c *gin.Context) {
 // @Tags espacos
 // @Produce json
 // @Success 200 {array} dto.SpaceOutputDTO
-// @Failure 500 {object} gin.H
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /espacos [get]
 func GetAllSpacesHandler(c *gin.Context) {
 	spaces, err := services.GetAllSpaces()
@@ -59,9 +59,9 @@ func GetAllSpacesHandler(c *gin.Context) {
 // @Produce json
 // @Param id path int true "ID do espaço"
 // @Success 200 {object} dto.SpaceOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 404 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /espacos/{id} [get]
 func GetSpacesByIDHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -90,8 +90,8 @@ func GetSpacesByIDHandler(c *gin.Context) {
 // @Param id path int true "ID do espaço"
 // @Param input body dto.UpdateSpaceDTO true "Novos dados do espaço"
 // @Success 200 {object} dto.SpaceOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /espacos/{id} [put]
 func UpdateSpaceHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -121,8 +121,8 @@ func UpdateSpaceHandler(c *gin.Context) {
 // @Tags espacos
 // @Param id path int true "ID do espaço"
 // @Success 204 {object} nil
-// @Failure 400 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /espacos/{id} [delete]
 func DeleteSpaceHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -147,9 +147,9 @@ func DeleteSpaceHandler(c *gin.Context) {
 // @Produce json
 // @Param id path int true "ID do espaço"
 // @Param input body dto.UpdateStatusDTO true "Novo status"
-// @Success 200 {object} gin.H
-// @Failure 400 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Success 200 {object} dto.MessageResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /espacos/{id}/status [patch]
 func UpdateSpaceStatusHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -169,7 +169,7 @@ func UpdateSpaceStatusHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Status atualizado com sucesso"})
+	c.JSON(http.StatusOK, dto.MessageResponse{Message: "Status atualizado com sucesso"})
 }
 
 // UpdateSpaceNoticeHandler atualiza apenas o aviso de um espaço.
@@ -180,9 +180,9 @@ func UpdateSpaceStatusHandler(c *gin.Context) {
 // @Produce json
 // @Param id path int true "ID do espaço"
 // @Param input body dto.UpdateNoticeDTO true "Novo aviso"
-// @Success 200 {object} gin.H
-// @Failure 400 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Success 200 {object} dto.MessageResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /espacos/{id}/aviso [patch]
 func UpdateSpaceNoticeHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -202,5 +202,5 @@ func UpdateSpaceNoticeHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Aviso atualizado com sucesso"})
+	c.JSON(http.StatusOK, dto.MessageResponse{Message: "Aviso atualizado com sucesso"})
 }

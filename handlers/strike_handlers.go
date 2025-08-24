@@ -17,9 +17,9 @@ import (
 // @Produce json
 // @Param input body dto.StrikeInputDTO true "Dados do strike"
 // @Success 201 {object} dto.StrikeOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 403 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /strikes [post]
 func CreateStrikeHandler(c *gin.Context) {
 	role := c.GetString("role")
@@ -47,9 +47,9 @@ func CreateStrikeHandler(c *gin.Context) {
 // @Produce json
 // @Param id path int true "ID do cliente"
 // @Success 200 {array} dto.StrikeOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 403 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /strikes/client/{id} [get]
 func GetStrikesByClientHandler(c *gin.Context) {
 	role := c.GetString("role")
@@ -77,9 +77,9 @@ func GetStrikesByClientHandler(c *gin.Context) {
 // @Tags strikes
 // @Param id path int true "ID do strike"
 // @Success 200 {object} dto.StrikeOutputDTO
-// @Failure 400 {object} gin.H
-// @Failure 403 {object} gin.H
-// @Failure 500 {object} gin.H
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /strikes/{id} [delete]
 func RevokeStrikeHandler(c *gin.Context) {
 	role := c.GetString("role")
