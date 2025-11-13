@@ -3,7 +3,7 @@
 
 Backend do sistema de reservas do CIPT Jaraguá.
 
-- [Documentação geral da API](API_DOCUMENTACAO_GERAL.md)
+- [Documentação geral da API](DOCUMENTACAO_COMPLETA.md)
 
 ## Requisitos
 
