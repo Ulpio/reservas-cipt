@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Ulpio/reservas-cipt/dto"
+	apierrors "github.com/Ulpio/reservas-cipt/errors"
 	"github.com/Ulpio/reservas-cipt/services"
 	"github.com/gin-gonic/gin"
 )
@@ -22,12 +23,12 @@ import (
 func LoginHandler(c *gin.Context) {
 	var input dto.LoginInputDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		apierrors.SendError(c, apierrors.ErrDadosInvalidos.WithDetails("Verifique se CPF e senha foram fornecidos"))
 		return
 	}
 	token, err := services.AuthenticateUser(input.CPF, input.Password)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"erorr": err.Error()})
+		apierrors.SendError(c, apierrors.ErrCredenciaisInvalidas)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"token": token})
