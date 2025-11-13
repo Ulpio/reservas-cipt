@@ -23,6 +23,7 @@ func SetupRoutes() {
 	SetupClientRoutes(api)
 	SetupReservationRoutes(api)
 	SetupStrikeRoutes(api)
+	SetupDashboardRoutes(api)
 
 	r.Run(":8080")
 }

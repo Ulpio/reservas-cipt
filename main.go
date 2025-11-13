@@ -26,7 +26,7 @@ func main() {
 }
 
 func InsertAdmin() {
-	_, err := services.CreateAdmin("Ulpio Paulo de Miranda Netto", "13366671416")
+	_, err := services.CreateAdmin("Administrador do Centro de Inovação", "0000000000")
 	if err != nil {
 		return
 	}
