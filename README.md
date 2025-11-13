@@ -3,6 +3,8 @@
 
 Backend do sistema de reservas do CIPT Jaraguá.
 
+- [Documentação geral da API](API_DOCUMENTACAO_GERAL.md)
+
 ## Requisitos
 
 - [Go](https://go.dev/) 1.20+
