@@ -13,24 +13,25 @@ import (
 
 // CreateReservationHandler registra uma nova reserva.
 // @Summary Cria reserva
-// @Description Cria uma nova reserva para um espaço.
+// @Description Cria uma nova reserva para um espaço com validações completas.
 // @Tags reservas
+// @Security BearerAuth
 // @Accept json
 // @Produce json
-// @Param input body dto.CreateReservationDTO true "Dados da reserva"
+// @Param input body dto.CreateReservationInputDTO true "Dados da reserva"
 // @Success 201 {object} dto.ReservationOutputDTO
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 409 {object} dto.ErrorResponse
 // @Router /reservas [post]
 func CreateReservationHandler(c *gin.Context) {
-	var input dto.CreateReservationDTO
+	var input dto.CreateReservationInputDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
 		apierrors.SendError(c, apierrors.ErrDadosInvalidos.WithDetails("Verifique os campos obrigatórios: client_id, receptionist_id, space_id, date, start_time, duration_hours"))
 		return
 	}
 
-	reservation, err := services.CreateReservation(input)
+	reservation, err := services.CreateReservationFromInput(input)
 	if err != nil {
 		handleReservationServiceError(c, err)
 		return

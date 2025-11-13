@@ -11,6 +11,7 @@ func SpaceRoutes(r *gin.RouterGroup) {
 	spaceGroup.Use(middleware.JWTAuthMiddleware())
 
 	spaceGroup.GET("", handlers.GetAllSpacesHandler)
+	spaceGroup.GET("/status", handlers.GetAllSpacesStatusHandler)
 	spaceGroup.GET("/:id", handlers.GetSpacesByIDHandler)
 
 	spaceGroup.PATCH("/:id/status", handlers.UpdateSpaceStatusHandler)

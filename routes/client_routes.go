@@ -10,9 +10,25 @@ func SetupClientRoutes(r *gin.RouterGroup) {
 	grupo := r.Group("/clientes")
 	grupo.Use(middleware.JWTAuthMiddleware())
 	{
-		grupo.PATCH("/:id", handlers.UpdateClientHandler)
-		grupo.GET("/:cpf", handlers.BuscarClientePorCPF)
-		grupo.POST("/buscar-criar", handlers.BuscarOuCriarClienteHandler)
+		// Listar todos
 		grupo.GET("", handlers.GetAllClientes)
+		
+		// Criar novo cliente
+		grupo.POST("", handlers.CreateClientHandler)
+		
+		// Buscar ou criar (endpoint legado)
+		grupo.POST("/buscar-criar", handlers.BuscarOuCriarClienteHandler)
+		
+		// Buscar por CPF
+		grupo.GET("/cpf/:cpf", handlers.BuscarClientePorCPF)
+		
+		// Buscar por telefone
+		grupo.GET("/phone/:phone", handlers.BuscarClientePorTelefone)
+		
+		// Buscar por ID (deve vir depois dos endpoints específicos)
+		grupo.GET("/:id", handlers.BuscarClientePorID)
+		
+		// Atualizar
+		grupo.PATCH("/:id", handlers.UpdateClientHandler)
 	}
 }

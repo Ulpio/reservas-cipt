@@ -9,6 +9,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetAllSpacesStatusHandler retorna o status de todos os espaços
+// @Summary Obter status de todos os espaços
+// @Description Retorna uma visão geral do status de todos os espaços, incluindo ocupação atual, próximas reservas e histórico do dia
+// @Tags espacos
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} dto.SpaceStatusDTO
+// @Failure 401 {object} dto.ErrorResponse "Não autenticado"
+// @Failure 500 {object} dto.ErrorResponse "Erro interno"
+// @Router /espacos/status [get]
+func GetAllSpacesStatusHandler(c *gin.Context) {
+	status, err := services.GetAllSpacesStatus()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar status dos espaços", "statusCode": 500})
+		return
+	}
+	c.JSON(http.StatusOK, status)
+}
+
 // CreateSpaceHandler cria um novo espaço disponível para reserva.
 // @Summary Cria um novo espaço físico
 // @Description Endpoint utilizado por administradores para cadastrar um novo espaço disponível para reserva.

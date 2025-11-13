@@ -14,5 +14,6 @@ func SetupReservationRoutes(r *gin.RouterGroup) {
 		group.POST("", handlers.CreateReservationHandler)
 		group.GET("", handlers.GetAllReservationsHandler)
 		group.GET("/:id", handlers.GetReservationByIDHandler)
+		group.DELETE("/:id", handlers.CancelReservationHandler)
 	}
 }
