@@ -3,8 +3,10 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Ulpio/reservas-cipt/dto"
+	apierrors "github.com/Ulpio/reservas-cipt/errors"
 	"github.com/Ulpio/reservas-cipt/services"
 	"github.com/gin-gonic/gin"
 )
@@ -23,13 +25,13 @@ import (
 func BuscarOuCriarClienteHandler(c *gin.Context) {
 	var input dto.ClienteInputDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos"})
+		apierrors.SendError(c, apierrors.ErrDadosInvalidos.WithDetails("Verifique os campos obrigatórios"))
 		return
 	}
 
 	cliente, err := services.BuscarOuCriarCliente(input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar ou criar cliente"})
+		handleClientServiceError(c, err)
 		return
 	}
 
@@ -49,7 +51,7 @@ func BuscarClientePorCPF(c *gin.Context) {
 	cpf := c.Param("cpf")
 	cliente, err := services.GetClientByCPF(cpf)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "usuario nao encontrado", "details": err.Error()})
+		apierrors.SendError(c, apierrors.ErrClienteNaoEncontrado.WithDetails("Verifique se o CPF está correto"))
 		return
 	}
 	c.JSON(http.StatusOK, cliente)
@@ -66,7 +68,7 @@ func BuscarClientePorCPF(c *gin.Context) {
 func GetAllClientes(c *gin.Context) {
 	clientes, err := services.GetAllClientes()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar ou criar cliente"})
+		apierrors.SendError(c, apierrors.ErrBancoDados.WithDetails("Erro ao listar clientes"))
 		return
 	}
 	c.JSON(http.StatusOK, clientes)
@@ -87,21 +89,78 @@ func GetAllClientes(c *gin.Context) {
 func UpdateClientHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID inválido"})
+		apierrors.SendError(c, apierrors.ErrIDInvalido.WithDetails("O ID do cliente deve ser um número válido"))
 		return
 	}
 
 	var input dto.ClienteInputDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		apierrors.SendError(c, apierrors.ErrDadosInvalidos.WithDetails("Verifique os campos fornecidos"))
 		return
 	}
 
 	updated, err := services.UpdateClient(uint(id), input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar cliente"})
+		handleClientServiceError(c, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, updated)
 }
+
+// handleClientServiceError trata erros específicos dos serviços de cliente
+func handleClientServiceError(c *gin.Context, err error) {
+	errMsg := err.Error()
+
+	// Erros de validação de CPF
+	if strings.Contains(errMsg, "CPF inválido") || strings.Contains(errMsg, "CPF deve ter") {
+		apierrors.SendError(c, apierrors.ErrCPFInvalido)
+		return
+	}
+	if strings.Contains(errMsg, "CPF já cadastrado") {
+		apierrors.SendError(c, apierrors.ErrCPFJaCadastrado)
+		return
+	}
+
+	// Erros de validação de email
+	if strings.Contains(errMsg, "email inválido") || strings.Contains(errMsg, "formato de email") {
+		apierrors.SendError(c, apierrors.ErrEmailInvalido)
+		return
+	}
+	if strings.Contains(errMsg, "email já cadastrado") {
+		apierrors.SendError(c, apierrors.ErrEmailJaCadastrado)
+		return
+	}
+
+	// Erros de validação de telefone
+	if strings.Contains(errMsg, "telefone inválido") || strings.Contains(errMsg, "telefone deve conter") {
+		apierrors.SendError(c, apierrors.ErrTelefoneInvalido)
+		return
+	}
+	if strings.Contains(errMsg, "telefone já cadastrado") {
+		apierrors.SendError(c, apierrors.ErrTelefoneJaCadastrado)
+		return
+	}
+
+	// Erros de validação de idade
+	if strings.Contains(errMsg, "18 anos") || strings.Contains(errMsg, "idade mínima") {
+		apierrors.SendError(c, apierrors.ErrIdadeMinima)
+		return
+	}
+
+	// Erros de validação de nome
+	if strings.Contains(errMsg, "nome deve ter") || strings.Contains(errMsg, "nome inválido") {
+		apierrors.SendError(c, apierrors.ErrNomeInvalido)
+		return
+	}
+
+	// Erros de data de nascimento
+	if strings.Contains(errMsg, "data de nascimento") {
+		apierrors.SendError(c, apierrors.ErrDataNascimentoInvalida)
+		return
+	}
+
+	// Erro genérico
+	apierrors.SendError(c, apierrors.ErrInterno.WithDetails(errMsg))
+}
+
